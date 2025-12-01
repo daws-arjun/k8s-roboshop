@@ -22,7 +22,7 @@ spec:
         component: roboshop
         tier: db
     spec:
-      Containers:
+      containers:
       - name: mongodb
         image: arjunaws/mongodb:v1  # presented in my docker hub
         imagePullPolicy: Always
