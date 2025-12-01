@@ -1,39 +1,67 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: Deployment                         # We are creating a Deployment
 metadata:
-  name: mongodb
-  namespace: roboshop
+  name: mongodb                           # Deployment name
+  namespace: roboshop                     # Runs in the 'roboshop' namespace
+
+  # Labels for the Deployment object (for identification only)
   labels:
     project: roboshop
-    component: roboshop
+    component: mongodb
     tier: db
+
 spec:
-  replicas: 1
-  selector:
-  # these labels are used to select pods
+  replicas: 1                              # Only 1 MongoDB pod should run (DB = single instance here)
+
+  selector:                                 # Deployment manages Pods matching these labels
     matchLabels:
       project: roboshop
-      component: roboshop
+      component: mongodb
       tier: db
+
+  # Pod template: Used by Deployment to create pods
   template:
     metadata:
-      labels:
+      labels:                              # MUST match selector labels
         project: roboshop
-        component: roboshop
+        component: mongodb
         tier: db
     spec:
       containers:
-      - name: mongodb
-        image: arjunaws/mongodb:v1  # presented in my docker hub
-        imagePullPolicy: Always
+      - name: mongodb                      # Container name
+        image: joindevops/mongodb:v1       # MongoDB application image
+        imagePullPolicy: Always            # Always pull the latest updated v1 image
+
+        # ---------- Readiness Probe ----------
+        # Checks if MongoDB is READY to accept traffic
+        # If not ready → Pod will NOT receive traffic from Service
         readinessProbe:
           tcpSocket:
-            port: 27017
-          initialDelaySeconds: 10
-          periodSeconds: 10
+            port: 27017                    # Checks MongoDB port 27017
+          initialDelaySeconds: 10          # Wait 10s before first check (MongoDB needs startup time)
+          periodSeconds: 10                # Check every 10 seconds
+
+        # ---------- Liveness Probe ----------
+        # Checks if MongoDB is ALIVE
+        # If check fails → Kubernetes kills container → Restarts it
         livenessProbe:
           tcpSocket:
-            port: 27017
-          initialDelaySeconds: 5
-          periodSeconds: 5
+            port: 27017                    # MongoDB must respond on this port
+          initialDelaySeconds: 5           # Start liveness check after 5 seconds
+          periodSeconds: 5                 # Check every 5 seconds
 
+---
+apiVersion: v1
+kind: Service                             # Creating a Service object
+metadata:
+  name: mongodb                            # Service name
+  namespace: roboshop                      # Same namespace as the Deployment
+spec:
+  selector:                                 # Service sends traffic to Pods matching these labels
+    project: roboshop
+    component: mongodb
+    tier: db
+  ports:
+    - protocol: TCP                         # MongoDB uses TCP
+      port: 27017                           # Service port (Stable cluster-internal port)
+      targetPort: 27017                     # Container MongoDB port in the Pod
