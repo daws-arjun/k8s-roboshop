@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace        # This tells Kubernetes that we are creating a Namespace object
+metadata:
+  name: roboshop       # Name of the namespace you want to create
+  labels:              # Labels (tags) used for organizing and identifying resources
+    environment: development  
+    project: roboshop
