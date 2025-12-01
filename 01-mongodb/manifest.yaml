@@ -29,7 +29,7 @@ spec:
     spec:
       containers:
       - name: mongodb                      # Container name
-        image: joindevops/mongodb:v1       # MongoDB application image
+        image: arjunaws/mongodb:v1         # MongoDB application image
         imagePullPolicy: Always            # Always pull the latest updated v1 image
 
         # ---------- Readiness Probe ----------
