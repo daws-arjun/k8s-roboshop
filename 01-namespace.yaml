@@ -4,4 +4,4 @@ metadata:
   name: roboshop       # Name of the namespace you want to create
   labels:              # Labels (tags) used for organizing and identifying resources
     environment: development  
-    project: roboshop
+    project: roboshop  # Project name
